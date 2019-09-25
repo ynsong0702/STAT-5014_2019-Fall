@@ -1,0 +1,119 @@
+---
+title: "Homework4"
+author: "Yining Song"
+output: pdf_document
+---
+
+
+Problem 6
+```{r}
+TTT=function(A){
+  mean1=mean(A[,1])
+  mean2=mean(A[,2])
+  sd1=sd(A[,1])
+  sd2=sd(A[,2])
+  corr=cor(A[,1],A[,2])
+  Mean=c(mean1,mean2)
+  SD=c(sd1,sd2)
+  T0=data.frame(Mean,SD,corr,row.names = c('dev1','dev2'))
+  return(T0)
+}
+A=readRDS("HW4_data.rds")
+Mean1=rep(0,13)
+Mean2=rep(0,13)
+Sd1=rep(0,13)
+Sd2=rep(0,13)
+for(i in 1:13){
+  B=A[((142*i-141):(142*i)),-1]
+  C=TTT(B)
+  Mean1[i]=C[1,1]
+  Mean2[i]=C[2,1]
+  Sd1[i]=C[1,2]
+  Sd2[i]=C[2,2]
+  print(C)
+}
+boxplot(Mean1,Mean2)
+```
+
+
+Problem 7
+
+The analytic solution is:
+```{r}
+I=sqrt(2*pi)*(pnorm(1)-pnorm(0))
+I
+```
+
+For the numerical methods:
+```{r}
+f=function(x){
+  y=exp(-x^2/2)
+  return(y)
+}
+Riemann=function(w){
+  x=seq(from=0,to=1,by=w)
+  y=0*x
+  for(i in 1:length(x)){
+    y[i]=f(x[i])*w
+  }
+  S=sum(y)
+  return(S)
+}
+A=matrix(0,6,3)
+A[,1]=.1^(1:6)
+for(i in 1:6){
+  A[i,2]=Riemann(10^(-i))
+  A[i,3]=abs(I-A[i,2])
+}
+A
+```
+
+
+
+Problem 8
+
+```{r}
+f=function(x){
+  y=3^x-sin(x)+cos(5*x)
+  return(y)
+}
+g=function(x){
+  y=log(3)*3^x-cos(x)-5*sin(5*x)
+  return(y)
+}
+Newton=function(interval,tol){
+  a=interval[1]
+  b=interval[2]
+  k=1
+  x=(a+b)/2
+  while(abs(f(x))>tol){
+    z=x-f(x)/g(x)
+    x=z
+    if(b-x>0 & x-a>0){
+      k=k+1
+    }else{
+      break
+    }
+  }
+  xiter=rep(0,k+1)
+  yiter=rep(0,k+1)
+  xiter[1]=(a+b)/2
+  yiter[1]=f((a+b)/2)
+  for(i in 2:(k+1)){
+    s=xiter[i-1]
+    t=s-f(s)/g(s)
+    xiter[i]=t
+    yiter[i]=f(t)
+  }
+  xiter=xiter[1:k]
+  yiter=yiter[1:k]
+  if(abs(yiter[k])<=tol){
+    plot(xiter,yiter,xlim = c(a,b),type = 'o')
+    return(xiter[k])
+  }else{
+    return('Root Not Found')
+  }
+}
+Newton(c(-10,0),0.0005)
+```
+
