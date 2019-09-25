@@ -1,0 +1,51 @@
+---
+title: "Homework1"
+author: "Yining Song"
+output: pdf_document
+---
+
+Problem 2
+
+A.
+In this course, I expect to learn:
+
+a)The basic concepts, principles, and techniques in R;
+
+b)How to do programming with R;
+
+c)How R can help us in analyzing data.
+
+
+
+B.
+\begin{equation}
+f(x|p)=\frac{1}{\Gamma(\frac{p}{2})2^{\frac{p}{2}}}x^{\frac{p}{2}-1}e^{-\frac{x}{2}}; \qquad 0 \leq x < \infty; \quad p=1,2,\cdots
+\end{equation}
+\begin{equation}
+f(x|\theta,\sigma)=\frac{1}{\pi \sigma}\frac{1}{1+(\frac{x-\theta}{\sigma})^2}, \quad -\infty < x < \infty; \quad -\infty < \theta < \infty, \quad \sigma>0
+\end{equation}
+\begin{equation}
+P(X=x|\lambda)=\frac{e^{-\lambda}\lambda^x}{x!}; \qquad x=0,1,\cdots, \quad 0 \leq \lambda < \infty
+\end{equation}
+
+
+Problem 3
+
+1.Collect data and read the data in R;
+
+2.Define variables and tables in R to store the data;
+
+3.Use functions in R to draw descriptive coclusions about the data;
+
+4.Plot the data(e.g.:scatter plot or histogram);
+
+5.Upload the codes and results using Git and share with others. 
+
+
+
+Problem 4
+
+```{r cars}
+plot(women$height)
+hist(women$height)
+```
