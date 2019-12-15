@@ -1,0 +1,75 @@
+---
+title: "Homework5"
+author: "Yining Song"
+output: html_document
+---
+
+Problem 2
+```{r}
+set.seed(12345)
+y=seq(from=1,to=100,length.out = 1e5)+rnorm(1e5)
+s1=0
+for(i in 1:1e5){
+  s1=s1+(y[i]-mean(y))^2
+}
+s1
+s2=t(y-mean(y))%*%(y-mean(y))
+s2
+system.time(for(i in 1:1e5){
+  s1=s1+(y[i]-mean(y))^2
+})
+system.time(sum((y-mean(y))^2))  #Sorry, my computer cannot run the opertaion of length 1e8.
+```
+
+
+Problem 3
+```{r}
+set.seed(1256)
+theta=as.matrix(c(1,2),nrow=2)
+X=cbind(1,rep(1:10,10))
+h=X%*%theta+rnorm(100,0,0.2)
+m=100
+a=10^(-5)
+tol=10^(-8)
+theta0=1
+theta1=1
+theta0_new=theta0-a*mean(X%*%c(theta0,theta1)-h)
+theta1_new=theta1-a/m*sum((X%*%c(theta0,theta1)-h)*X[,2])
+while(abs(theta0-theta0_new)>tol && abs(theta1-theta1_new)>tol){
+  theta0=theta0_new
+  theta1=theta1_new
+  theta0_new=theta0-a*mean(X%*%c(theta0,theta1)-h)
+  theta1_new=theta1-a/m*sum((X%*%c(theta0,theta1)-h)*X[,2])
+}
+c(theta0,theta1)
+coefficients(lm(h~0+X))
+```
+
+
+Problem 5
+```{r}
+set.seed(12456)
+G=matrix(sample(c(0,0.5,1),size = 1600,replace = TRUE),ncol = 10)
+R=cor(G)
+C=kronecker(R,diag(160))
+id=sample(1:1600,size = 92,replace = FALSE)
+q=sample(c(0,0.5,1),size = 1508,replace = TRUE)
+A=C[id,-id]
+B=C[-id,-id]
+p=runif(92)
+r=runif(1508)   # Sorry, my computer cannot store matrices of dimension 16000*16000
+```
+
+Part a
+
+$A$ is 1.1 Mb $=1.1\times10^6$ bytes, $B$ is 17.3 Mb $=1.73\times10^7$ bytes
+```{r}
+y=p+A%*%solve(B)%*%(q-r)
+head(y)
+timeA=system.time(p+A%*%solve(B)%*%(q-r))
+timeA
+```
+
+
+
+
