@@ -1,0 +1,116 @@
+---
+title: "Homework6"
+author: "Yining Song"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Problem 3
+(a)
+```{r}
+sp=function(x){
+  n=length(x)
+  s=sum(x)
+  p=s/n
+  return(p)
+}
+```
+
+
+(b)
+```{r}
+set.seed(12345)
+P4b_data=matrix(rbinom(10,1,prob = (30:40)/100),nrow = 10,ncol = 10,byrow = FALSE)
+```
+
+
+(c)
+```{r}
+apply(P4b_data,2,sp)
+apply(P4b_data,1,sp)
+```
+The row probabilities are all 1 or 0, and the column probabilities are all 0.6. This is because the columns of P4b_data are all identical.
+
+
+(d)
+```{r}
+pvector=function(p){
+  x=rbinom(10,1,prob = p)
+  return(x)
+}
+set.seed(12345)
+pbty=as.array((30:40)/100)
+P4b_data2=apply(pbty,1,pvector)
+apply(P4b_data2,2,sp)
+apply(P4b_data2,1,sp)
+```
+
+
+Problem 4
+```{r}
+A=readRDS("HW4_data.rds")
+colnames(A)
+colnames(A)[2]="x"
+colnames(A)[3]="y"
+```
+
+
+(a)
+```{r}
+SCP=function(T){
+  xx=T[,1]
+  yy=T[,2]
+  plot(xx,yy)
+}
+SCP(A[,-1])
+```
+
+
+
+Problem 5
+
+(a)
+```{r}
+library(data.table)
+states=fread(input = "states.sql",skip = 23,sep = "'", sep2 = ",", header = F, select = c(2,4))
+cities=fread(input = "cities.sql",sep = "'", sep2 = ",", header = F, select = c(2,4))
+
+```
+
+(b)
+```{r}
+tapply(cities$V2,cities$V4,length)
+```
+
+(c)
+```{r}
+letter_count=data.frame(matrix(NA,nrow=51, ncol=26))
+getCount=function(letter,state_name){
+  temp=strsplit(state_name,'')
+  count=sum(unlist(temp)==letter)
+  return(count)
+}
+alphab=c('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p'
+         ,'q','r','s','t','u','v','w','x','y','z')
+Alphab=c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P'
+         ,'Q','R','S','T','U','V','W','X','Y','Z')
+for(i in 1:51){
+  for(j in 1:26){
+    letter_count[i,j]=getCount(alphab[j],states$V2[i])+getCount(Alphab[j],states$V2[i])
+  }
+}
+colnames(letter_count)=alphab
+row.names(letter_count)=states$V2
+letter_count
+```
+
+
+(d)
+package fiftystater is not available for my R.
+
+
+
+
