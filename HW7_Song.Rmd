@@ -1,0 +1,127 @@
+---
+title: "Homework7"
+author: "Yining Song"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Problem 2
+(a)
+```{r}
+library(quantreg)
+library(quantmod)
+data(barro)
+A=getSymbols('AAPL',from = '2008-1-1', to = "2008-12-31",auto.assign=FALSE)[,6]
+b=getSymbols('^ixic', from = '2008-1-1', to = "2008-12-31",auto.assign=FALSE)[,6]
+summary(A)
+summary(b)
+lA=ROC(A)*100
+lb=ROC(b)*100
+beta1=coefficients(lm(lA~lb))[2]
+beta1
+data1=cbind(lA,lb)
+f=function(r){
+  set.seed(r)
+  sample=data1[sample(nrow(data1), size = nrow(A), replace = TRUE),]
+  return (coef(summary(lm(AAPL.Adjusted~IXIC.Adjusted, data = sample)))[2,2])
+}
+mean(sapply(c(1:100), f))
+
+```
+
+
+(b)
+```{r}
+library(dplyr)
+library(ggplot2)
+C=matrix(0,nrow = 1000,ncol = 5)
+data2=read.table("Sensory.dat.txt",fill = T)
+data2=as.matrix(data2[-c(1:2), ])
+for (i in 1:10) {
+  data2[3*i-1,]=c(i,data2[3*i-1,1:5])
+  data2[3*i,]=c(i,data2[3*i,1:5])
+}
+print(data2)
+data2=data2 %>% as.data.frame() %>% rename(item = V1,I1 = V2, I2= V3, I3= V4, I4= V5,I5 = V6) %>%
+  mutate_if(is.factor, as.character) %>% mutate_if(is.character, as.numeric )
+print(data2)
+
+g=function(r){
+  sample=data2[sample(nrow(data2), size = 100, replace = TRUE),2:6]
+  return (coef(summary(lm(I1~I2+I3+I4+I5, data=data2)))[,1])
+}
+t1=Sys.time()
+res=sapply(c(1:100),g)
+t2=Sys.time()
+t2-t1
+
+res=res %>% as.data.frame() %>% rename(I2=V2,I3=V3,I4=V4,I5=V5,
+                                          Intercep = V1)
+summary(res)
+```
+
+(c)
+```{r}
+library(parallel)
+library(foreach)
+library(doParallel)
+
+cs=detectCores()
+cl=makeCluster(cs[1]-1)
+registerDoParallel(cl)
+
+h=function(r){
+  set.seed(r)
+  sample=data2[sample(nrow(data2), size = 100, replace = TRUE),2:6]
+  return (coef(summary(lm(I1~I2+I3+I4+I5, data =data2)))[,1])
+}
+tt1=Sys.time()
+res=sapply(c(1:100),h)
+tt2=Sys.time()
+tt2-tt1
+stopCluster(cl)
+
+```
+
+Problem 3
+
+(a)
+```{r}
+library(ggplot2)
+f=function(x){
+  y=3^x-sin(x)+cos(5*x)
+  return(y)
+}
+g=function(x){
+  y=3^x*log(3)-cos(x)-5*sin(5*x)
+  return(y)
+}
+ggplot(data=data.frame(x = 0,y = 0), mapping = aes(x = x)) +
+  stat_function(fun=f) +
+  xlim(-100, 2) +
+  geom_abline(intercept = 0, slope = 0)
+
+froot=function(x) {while (abs(f(x)-0) > 1e-6) {
+  z=x-f(x)/g(x)
+  return(z)
+}}
+froot(2.5)
+T1=Sys.time()
+sapply(c(-100:0), froot)
+T2=Sys.time()
+T2-T1
+```
+
+(b)
+```{r}
+T3=Sys.time()
+mclapply(-100:0, froot, mc.cores = 1)
+T4=Sys.time()
+T3-T4
+```
+
+
